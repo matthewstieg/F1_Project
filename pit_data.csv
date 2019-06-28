@@ -1,4 +1,4 @@
-raceId,driverId,pit_stop_number,Pit_lap,pit_timestamp,pit_duration,pit_milliseconds,Race Name,driverRef
+raceId,driverId,pit_stop_number,Pit_lap,pit_timestamp,pit_duration,pit_milliseconds,RaceName,driverRef
 841,153,1,1,17:05:23,26.898,26898,2011-Australian Grand Prix,alguersuari
 841,30,1,1,17:05:52,25.021,25021,2011-Australian Grand Prix,michael_schumacher
 841,17,1,11,17:20:48,23.426,23426,2011-Australian Grand Prix,webber
