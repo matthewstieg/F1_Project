@@ -1,0 +1,592 @@
+<!doctype html>
+<title>Formula 1</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
+<script>
+  $SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
+  var races = {{ g.races|safe }};
+  var raceGraph = {{ g.raceGraph|safe }}
+  // var map = {{ g.map|safe }}
+</script>
+<nav>
+  <h1>Formula 1</h1>
+</nav>
+<section class="content">
+  <div class="flex-grid-thirds">
+      <div class="col">
+          <div>
+              <h1 id="raceName" style="font-family:sans-serif;color:whitesmoke;"></h1>
+              <div id="position_order_container" class="svg-container"></div>
+          </div>
+      </div>
+      <div class="col">
+          <div>
+              <h1 style="font-family:sans-serif;color:whitesmoke;">Select Race for Driver Results by Lap</h1>
+              <h5>SELECT Race:</h5>
+              <form name="myform" onsubmit="SetData()" action="/" method="GET">
+              <select id="raceId" name='raceId'>
+              </select>
+              <button type="submit">View Race</button>              
+              </form>
+              <div id="race_graph_container"></div>
+              <span class="legend">M = mechanical failure | P = pit stop | X = accident |  <span
+        class="safety">safety-car deployed</span> | <span class="lapped">lapped</span> | Mouse click to focus on a lap</span>
+          </div>
+      </div>
+      <div class="col">
+      </div>
+    </div>
+</section>
+<!--  -->
+<div class="flex-grid-thirds">
+<div class="col">
+<div id="map"></div>
+</div> <!-- col class -->
+</div> <!-- flex-grid-thirds class -->
+
+<script src="{{ url_for('static', filename='js/jquery-3.4.1.min.js') }}"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/5.5.0/d3.js"></script>
+<script src="{{ url_for('static', filename='js/d3.v3.min.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/racegraph.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/positionorder.js') }}"></script>
+  <script src="https://unpkg.com/leaflet@1.5.1/dist/leaflet.js" integrity="sha512-GffPMF3RvMeYyc1LWMHtK8EbPv0iNZ8/oTtHPx9/cc2ILxQ+u905qIwdpULaqDkyBKgOaB57QTMg7ztg8Jm2Og==" crossorigin=""></script>
+
+
+<!-- 
+<script type="text/javascript">
+var API_KEY = "pk.eyJ1IjoiYXVudGllYW5nZWxiIiwiYSI6ImNqd3ZnaDBtODBpcG4zeW4xbDdod3pyd3AifQ.ie-VKuEPmGLzQGCjsU5Q3Q"
+var myMap = L.map("map", {
+  center: [-37.8497, 144.968],
+  zoom: 2
+});
+
+// Add a tile layer
+L.tileLayer("https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}", {
+  attribution: "Map data &copy; <a href=\"https://www.openstreetmap.org/\">OpenStreetMap</a> contributors, <a href=\"https://creativecommons.org/licenses/by-sa/2.0/\">CC-BY-SA</a>, Imagery © <a href=\"https://www.mapbox.com/\">Mapbox</a>",
+  maxZoom: 18,
+  id: "mapbox.streets",
+  accessToken: API_KEY
+}).addTo(myMap);
+
+// An array containing each city's name, location, and population
+var venues = 
+[
+  {
+    "RaceName": "2008-Australian Grand Prix", 
+    "circuitId": 1, 
+    "circuit_country": "Australia", 
+    "circuit_location": "Melbourne", 
+    "circuit_name": "Albert Park Grand Prix Circuit", 
+    "constructorId": 1, 
+    "date": "3/16/2008", 
+    "dob": "7/1/1985", 
+    "driverId": 1, 
+    "driverRef": "hamilton", 
+    "driver_nationality": "British", 
+    "driver_number": 44.0, 
+    "fastestLap": 39.0, 
+    "fastestLapSpeed": "218.3", 
+    "fastestLapTime": "01:27.5", 
+    "grid": 1, 
+    "laps": 58, 
+    "location": [
+      -37.8497, 
+      144.968
+    ], 
+    "milliseconds": 5690616.0, 
+    "points": 10.0, 
+    "position": 1.0, 
+    "positionOrder": 1, 
+    "positionText": "1", 
+    "raceId": 18, 
+    "race_name": "Australian Grand Prix", 
+    "rank": 2.0, 
+    "resuldID": 1, 
+    "round": 1, 
+    "status": "Finished", 
+    "statusId": 1, 
+    "team_name": "McLaren", 
+    "team_nationality": "British", 
+    "time": "34:50.6", 
+    "year": "2008"
+  }, 
+  {
+    "RaceName": "2008-Australian Grand Prix", 
+    "circuitId": 1, 
+    "circuit_country": "Australia", 
+    "circuit_location": "Melbourne", 
+    "circuit_name": "Albert Park Grand Prix Circuit", 
+    "constructorId": 2, 
+    "date": "3/16/2008", 
+    "dob": "10/5/1977", 
+    "driverId": 2, 
+    "driverRef": "heidfeld", 
+    "driver_nationality": "German", 
+    "driver_number": null, 
+    "fastestLap": 41.0, 
+    "fastestLapSpeed": "217.586", 
+    "fastestLapTime": "01:27.7", 
+    "grid": 5, 
+    "laps": 58, 
+    "location": [
+      -37.8497, 
+      144.968
+    ], 
+    "milliseconds": 5696094.0, 
+    "points": 8.0, 
+    "position": 2.0, 
+    "positionOrder": 2, 
+    "positionText": "2", 
+    "raceId": 18, 
+    "race_name": "Australian Grand Prix", 
+    "rank": 3.0, 
+    "resuldID": 2, 
+    "round": 1, 
+    "status": "Finished", 
+    "statusId": 1, 
+    "team_name": "BMW Sauber", 
+    "team_nationality": "German", 
+    "time": "5.478", 
+    "year": "2008"
+  }, 
+  {
+    "RaceName": "2008-Australian Grand Prix", 
+    "circuitId": 1, 
+    "circuit_country": "Australia", 
+    "circuit_location": "Melbourne", 
+    "circuit_name": "Albert Park Grand Prix Circuit", 
+    "constructorId": 3, 
+    "date": "3/16/2008", 
+    "dob": "27/06/1985", 
+    "driverId": 3, 
+    "driverRef": "rosberg", 
+    "driver_nationality": "German", 
+    "driver_number": 6.0, 
+    "fastestLap": 41.0, 
+    "fastestLapSpeed": "216.719", 
+    "fastestLapTime": "01:28.1", 
+    "grid": 7, 
+    "laps": 58, 
+    "location": [
+      -37.8497, 
+      144.968
+    ], 
+    "milliseconds": 5698779.0, 
+    "points": 6.0, 
+    "position": 3.0, 
+    "positionOrder": 3, 
+    "positionText": "3", 
+    "raceId": 18, 
+    "race_name": "Australian Grand Prix", 
+    "rank": 5.0, 
+    "resuldID": 3, 
+    "round": 1, 
+    "status": "Finished", 
+    "statusId": 1, 
+    "team_name": "Williams", 
+    "team_nationality": "British", 
+    "time": "8.163", 
+    "year": "2008"
+  }, 
+  {
+    "RaceName": "2008-Australian Grand Prix", 
+    "circuitId": 1, 
+    "circuit_country": "Australia", 
+    "circuit_location": "Melbourne", 
+    "circuit_name": "Albert Park Grand Prix Circuit", 
+    "constructorId": 4, 
+    "date": "3/16/2008", 
+    "dob": "29/07/1981", 
+    "driverId": 4, 
+    "driverRef": "alonso", 
+    "driver_nationality": "Spanish", 
+    "driver_number": 14.0, 
+    "fastestLap": 58.0, 
+    "fastestLapSpeed": "215.464", 
+    "fastestLapTime": "01:28.6", 
+    "grid": 11, 
+    "laps": 58, 
+    "location": [
+      -37.8497, 
+      144.968
+    ], 
+    "milliseconds": 5707797.0, 
+    "points": 5.0, 
+    "position": 4.0, 
+    "positionOrder": 4, 
+    "positionText": "4", 
+    "raceId": 18, 
+    "race_name": "Australian Grand Prix", 
+    "rank": 7.0, 
+    "resuldID": 4, 
+    "round": 1, 
+    "status": "Finished", 
+    "statusId": 1, 
+    "team_name": "Renault", 
+    "team_nationality": "French", 
+    "time": "17.181", 
+    "year": "2008"
+  }, 
+  {
+    "RaceName": "2008-Australian Grand Prix", 
+    "circuitId": 1, 
+    "circuit_country": "Australia", 
+    "circuit_location": "Melbourne", 
+    "circuit_name": "Albert Park Grand Prix Circuit", 
+    "constructorId": 1, 
+    "date": "3/16/2008", 
+    "dob": "19/10/1981", 
+    "driverId": 5, 
+    "driverRef": "kovalainen", 
+    "driver_nationality": "Finnish", 
+    "driver_number": null, 
+    "fastestLap": 43.0, 
+    "fastestLapSpeed": "218.385", 
+    "fastestLapTime": "01:27.4", 
+    "grid": 3, 
+    "laps": 58, 
+    "location": [
+      -37.8497, 
+      144.968
+    ], 
+    "milliseconds": 5708630.0, 
+    "points": 4.0, 
+    "position": 5.0, 
+    "positionOrder": 5, 
+    "positionText": "5", 
+    "raceId": 18, 
+    "race_name": "Australian Grand Prix", 
+    "rank": 1.0, 
+    "resuldID": 5, 
+    "round": 1, 
+    "status": "Finished", 
+    "statusId": 1, 
+    "team_name": "McLaren", 
+    "team_nationality": "British", 
+    "time": "18.014", 
+    "year": "2008"
+  }, 
+  {
+    "RaceName": "2008-Australian Grand Prix", 
+    "circuitId": 1, 
+    "circuit_country": "Australia", 
+    "circuit_location": "Melbourne", 
+    "circuit_name": "Albert Park Grand Prix Circuit", 
+    "constructorId": 3, 
+    "date": "3/16/2008", 
+    "dob": "11/1/1985", 
+    "driverId": 6, 
+    "driverRef": "nakajima", 
+    "driver_nationality": "Japanese", 
+    "driver_number": null, 
+    "fastestLap": 50.0, 
+    "fastestLapSpeed": "212.974", 
+    "fastestLapTime": "01:29.6", 
+    "grid": 13, 
+    "laps": 57, 
+    "location": [
+      -37.8497, 
+      144.968
+    ], 
+    "milliseconds": null, 
+    "points": 3.0, 
+    "position": 6.0, 
+    "positionOrder": 6, 
+    "positionText": "6", 
+    "raceId": 18, 
+    "race_name": "Australian Grand Prix", 
+    "rank": 14.0, 
+    "resuldID": 6, 
+    "round": 1, 
+    "status": "+1 Lap", 
+    "statusId": 11, 
+    "team_name": "Williams", 
+    "team_nationality": "British", 
+    "time": null, 
+    "year": "2008"
+  }, 
+  {
+    "RaceName": "2008-Australian Grand Prix", 
+    "circuitId": 1, 
+    "circuit_country": "Australia", 
+    "circuit_location": "Melbourne", 
+    "circuit_name": "Albert Park Grand Prix Circuit", 
+    "constructorId": 5, 
+    "date": "3/16/2008", 
+    "dob": "28/02/1979", 
+    "driverId": 7, 
+    "driverRef": "bourdais", 
+    "driver_nationality": "French", 
+    "driver_number": null, 
+    "fastestLap": 22.0, 
+    "fastestLapSpeed": "213.224", 
+    "fastestLapTime": "01:29.5", 
+    "grid": 17, 
+    "laps": 55, 
+    "location": [
+      -37.8497, 
+      144.968
+    ], 
+    "milliseconds": null, 
+    "points": 2.0, 
+    "position": 7.0, 
+    "positionOrder": 7, 
+    "positionText": "7", 
+    "raceId": 18, 
+    "race_name": "Australian Grand Prix", 
+    "rank": 12.0, 
+    "resuldID": 7, 
+    "round": 1, 
+    "status": "Engine", 
+    "statusId": 5, 
+    "team_name": "Toro Rosso", 
+    "team_nationality": "Italian", 
+    "time": null, 
+    "year": "2008"
+  }, 
+  {
+    "RaceName": "2008-Australian Grand Prix", 
+    "circuitId": 1, 
+    "circuit_country": "Australia", 
+    "circuit_location": "Melbourne", 
+    "circuit_name": "Albert Park Grand Prix Circuit", 
+    "constructorId": 6, 
+    "date": "3/16/2008", 
+    "dob": "17/10/1979", 
+    "driverId": 8, 
+    "driverRef": "raikkonen", 
+    "driver_nationality": "Finnish", 
+    "driver_number": 7.0, 
+    "fastestLap": 20.0, 
+    "fastestLapSpeed": "217.18", 
+    "fastestLapTime": "01:27.9", 
+    "grid": 15, 
+    "laps": 53, 
+    "location": [
+      -37.8497, 
+      144.968
+    ], 
+    "milliseconds": null, 
+    "points": 1.0, 
+    "position": 8.0, 
+    "positionOrder": 8, 
+    "positionText": "8", 
+    "raceId": 18, 
+    "race_name": "Australian Grand Prix", 
+    "rank": 4.0, 
+    "resuldID": 8, 
+    "round": 1, 
+    "status": "Engine", 
+    "statusId": 5, 
+    "team_name": "Ferrari", 
+    "team_nationality": "Italian", 
+    "time": null, 
+    "year": "2008"
+  }, 
+  {
+    "RaceName": "2008-Australian Grand Prix", 
+    "circuitId": 1, 
+    "circuit_country": "Australia", 
+    "circuit_location": "Melbourne", 
+    "circuit_name": "Albert Park Grand Prix Circuit", 
+    "constructorId": 2, 
+    "date": "3/16/2008", 
+    "dob": "7/12/1984", 
+    "driverId": 9, 
+    "driverRef": "kubica", 
+    "driver_nationality": "Polish", 
+    "driver_number": null, 
+    "fastestLap": 15.0, 
+    "fastestLapSpeed": "215.1", 
+    "fastestLapTime": "01:28.8", 
+    "grid": 2, 
+    "laps": 47, 
+    "location": [
+      -37.8497, 
+      144.968
+    ], 
+    "milliseconds": null, 
+    "points": 0.0, 
+    "position": null, 
+    "positionOrder": 9, 
+    "positionText": "R", 
+    "raceId": 18, 
+    "race_name": "Australian Grand Prix", 
+    "rank": 9.0, 
+    "resuldID": 9, 
+    "round": 1, 
+    "status": "Collision", 
+    "statusId": 4, 
+    "team_name": "BMW Sauber", 
+    "team_nationality": "German", 
+    "time": null, 
+    "year": "2008"
+  }, 
+  {
+    "RaceName": "2008-Australian Grand Prix", 
+    "circuitId": 1, 
+    "circuit_country": "Australia", 
+    "circuit_location": "Melbourne", 
+    "circuit_name": "Albert Park Grand Prix Circuit", 
+    "constructorId": 7, 
+    "date": "3/16/2008", 
+    "dob": "18/03/1982", 
+    "driverId": 10, 
+    "driverRef": "glock", 
+    "driver_nationality": "German", 
+    "driver_number": null, 
+    "fastestLap": 23.0, 
+    "fastestLapSpeed": "213.166", 
+    "fastestLapTime": "01:29.6", 
+    "grid": 18, 
+    "laps": 43, 
+    "location": [
+      -37.8497, 
+      144.968
+    ], 
+    "milliseconds": null, 
+    "points": 0.0, 
+    "position": null, 
+    "positionOrder": 10, 
+    "positionText": "R", 
+    "raceId": 18, 
+    "race_name": "Australian Grand Prix", 
+    "rank": 13.0, 
+    "resuldID": 10, 
+    "round": 1, 
+    "status": "Accident", 
+    "statusId": 3, 
+    "team_name": "Toyota", 
+    "team_nationality": "Japanese", 
+    "time": null, 
+    "year": "2008"
+  },
+  {
+    "RaceName": "2017-Abu Dhabi Grand Prix",
+    "circuitId": 24,
+    "circuit_country": "UAE",
+    "circuit_location": "Abu Dhabi",
+    "circuit_name": "Yas Marina Circuit",
+    "constructorId": 9,
+    "date": "11/26/2017",
+    "dob": "1/7/1989",
+    "driverId": 817,
+    "driverRef": "ricciardo",
+    "driver_nationality": "Australian",
+    "driver_number": 3.0,
+    "fastestLap": 13.0,
+    "fastestLapSpeed": "194.579",
+    "fastestLapTime": "01:42.8",
+    "grid": 4,
+    "laps": 20,
+    "location": [
+      24.4672,
+      54.6031
+    ],
+    "milliseconds": null,
+    "points": 0.0,
+    "position": null,
+    "positionOrder": 20,
+    "positionText": "R",
+    "raceId": 988,
+    "race_name": "Abu Dhabi Grand Prix",
+    "rank": 12.0,
+    "resuldID": 23781,
+    "round": 20,
+    "status": "Hydraulics",
+    "statusId": 9,
+    "team_name": "Red Bull",
+    "team_nationality": "Austrian",
+    "time": null,
+    "year": "2017"
+  },
+  {
+    "RaceName": "1961-British Grand Prix",
+    "circuitId": 58,
+    "circuit_country": "UK",
+    "circuit_location": "Liverpool",
+    "circuit_name": "Aintree",
+    "constructorId": 170,
+    "date": "7/15/1961",
+    "dob": "2/4/1926",
+    "driverId": 356,
+    "driverRef": "jack_brabham",
+    "driver_nationality": "Australian",
+    "driver_number": null,
+    "fastestLap": null,
+    "fastestLapSpeed": null,
+    "fastestLapTime": null,
+    "grid": 9,
+    "laps": 75,
+    "location": [
+      53.4769,
+      -2.94056
+    ],
+    "milliseconds": 9722200.0,
+    "points": 3.0,
+    "position": 4.0,
+    "positionOrder": 4,
+    "positionText": "4",
+    "raceId": 742,
+    "race_name": "British Grand Prix",
+    "rank": null,
+    "resuldID": 17947,
+    "round": 5,
+    "status": "Finished",
+    "statusId": 1,
+    "team_name": "Cooper-Climax",
+    "team_nationality": "British",
+    "time": "+1:08.6",
+    "year": "1961"
+  },
+  {
+    "RaceName": "1980-Brazilian Grand Prix",
+    "circuitId": 18,
+    "circuit_country": "Brazil",
+    "circuit_location": "S\u00cc\u00a3o Paulo",
+    "circuit_name": "Aut\u00cc_dromo Jos\u00cc\u00a9 Carlos Pace",
+    "constructorId": 1,
+    "date": "1/27/1980",
+    "dob": "24/02/1955",
+    "driverId": 117,
+    "driverRef": "prost",
+    "driver_nationality": "French",
+    "driver_number": null,
+    "fastestLap": null,
+    "fastestLapSpeed": null,
+    "fastestLapTime": null,
+    "grid": 13,
+    "laps": 40,
+    "location": [
+      -23.7036,
+      -46.6997
+    ],
+    "milliseconds": 6106740.0,
+    "points": 2.0,
+    "position": 5.0,
+    "positionOrder": 5,
+    "positionText": "5",
+    "raceId": 499,
+    "race_name": "Brazilian Grand Prix",
+    "rank": null,
+    "resuldID": 12026,
+    "round": 2,
+    "status": "Finished",
+    "statusId": 1,
+    "team_name": "McLaren",
+    "team_nationality": "British",
+    "time": "+1:45.41",
+    "year": "1980"
+  }];
+
+
+// Loop through the cities array and create one marker for each city, bind a popup containing its name and population add it to the map
+for (var i = 0; i < venues.length; i++) {
+  var circuit = venues[i];
+  L.marker(circuit.location )
+    .bindPopup("<h1>" + circuit.circuit_name + "</h1> <hr> <h3> Visit Track at " + circuit.circuit_location, circuit.circuit_country + "</h3>")
+    .addTo(myMap);
+}
+</script>
+ -->
